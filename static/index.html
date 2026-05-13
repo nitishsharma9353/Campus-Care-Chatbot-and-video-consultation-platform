@@ -1,0 +1,1557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CampusCare — Student Health Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://sdk.twilio.com/js/video/releases/2.28.1/twilio-video.min.js"></script>
+<style>
+:root{
+  --bg:#f4f1ec;
+  --paper:#ffffff;
+  --muted:#f0ebe2;
+  --muted2:#e8e0d4;
+  --border:#ddd5c5;
+  --border2:#c8bfaf;
+  --ink:#171310;
+  --ink2:#3a3020;
+  --ink3:#6b6050;
+  --ink4:#a09080;
+  --green:#1c4230;
+  --green-m:#2e6b49;
+  --green-lt:#eaf4ee;
+  --green-bd:#a8d8ba;
+  --red:#7a1c1c;
+  --red-lt:#fdf0f0;
+  --red-bd:#e8aaaa;
+  --blue:#1a3d78;
+  --blue-lt:#eef3ff;
+  --blue-bd:#bfd0f8;
+  --amber:#7c4800;
+  --amber-lt:#fff8ed;
+  --amber-bd:#fbd38d;
+  --violet:#4a1d7a;
+  --violet-lt:#f5f0ff;
+  --violet-bd:#c4a8f8;
+  --teal:#0c5460;
+  --teal-lt:#e8f7f9;
+  --teal-bd:#a0d8e0;
+  --r:14px;--R:20px;
+  --sh:0 2px 12px rgba(23,19,16,.07);
+  --sh2:0 8px 40px rgba(23,19,16,.13);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Manrope',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ══ AUTH ══════════════════════════════════════════════════ */
+#scr-auth{min-height:100vh;display:flex;align-items:stretch}
+.auth-panel{
+  width:400px;flex-shrink:0;
+  background:var(--green);
+  padding:44px 40px;
+  display:flex;flex-direction:column;gap:36px;
+  position:relative;overflow:hidden;
+}
+.auth-panel::before{
+  content:'';position:absolute;
+  right:-100px;bottom:-100px;
+  width:380px;height:380px;border-radius:50%;
+  background:rgba(255,255,255,.04);
+}
+.auth-panel::after{
+  content:'';position:absolute;
+  left:-60px;top:-60px;
+  width:260px;height:260px;border-radius:50%;
+  background:rgba(255,255,255,.03);
+}
+.ap-logo{display:flex;align-items:center;gap:12px;position:relative;z-index:1}
+.ap-logo-icon{
+  width:44px;height:44px;border-radius:12px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.ap-logo h1{color:#fff;font-family:'Lora',serif;font-size:22px;font-weight:700;letter-spacing:-.3px}
+.ap-hero{position:relative;z-index:1}
+.ap-hero h2{color:#fff;font-family:'Lora',serif;font-size:30px;font-weight:700;line-height:1.25;letter-spacing:-.5px;margin-bottom:12px}
+.ap-hero p{color:rgba(255,255,255,.6);font-size:13.5px;line-height:1.75;font-weight:400}
+.ap-flow{position:relative;z-index:1;display:flex;flex-direction:column;gap:14px}
+.ap-step{display:flex;gap:14px;align-items:flex-start}
+.ap-step-n{
+  width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;
+  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.9);font-size:11px;font-weight:700;
+}
+.ap-step-body strong{display:block;color:#fff;font-size:13px;font-weight:600;margin-bottom:2px}
+.ap-step-body span{color:rgba(255,255,255,.6);font-size:12px;line-height:1.5}
+.ap-footer{
+  position:relative;z-index:1;
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--r);padding:14px 16px;
+}
+.ap-footer p{color:rgba(255,255,255,.45);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.ap-footer h4{color:#fff;font-size:14px;font-weight:600}
+.ap-footer span{color:rgba(255,255,255,.5);font-size:12px}
+
+.auth-form-area{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:40px 32px;background:var(--bg);
+}
+.auth-box{
+  width:100%;max-width:460px;
+  background:var(--paper);border:1px solid var(--border);
+  border-radius:24px;padding:38px 36px;
+  box-shadow:var(--sh2);
+}
+.role-switch{
+  display:grid;grid-template-columns:1fr 1fr;gap:0;
+  background:var(--muted);border-radius:11px;padding:4px;margin-bottom:26px;
+}
+.rs-btn{
+  padding:10px;border:none;border-radius:8px;
+  background:transparent;font-family:'Manrope',sans-serif;
+  font-size:13px;font-weight:600;color:var(--ink3);cursor:pointer;transition:all .2s;
+}
+.rs-btn.on{background:var(--paper);color:var(--ink);box-shadow:0 1px 6px rgba(23,19,16,.1)}
+.tab-switch{display:flex;border-bottom:1.5px solid var(--border);margin-bottom:24px}
+.ts-btn{
+  padding:10px 0;margin-right:22px;border:none;background:transparent;
+  font-family:'Manrope',sans-serif;font-size:14px;font-weight:600;
+  color:var(--ink3);cursor:pointer;position:relative;transition:color .2s;
+}
+.ts-btn::after{content:'';position:absolute;bottom:-1.5px;left:0;right:0;height:2px;
+  background:var(--green);transform:scaleX(0);transition:transform .2s;border-radius:2px}
+.ts-btn.on{color:var(--green)}
+.ts-btn.on::after{transform:scaleX(1)}
+.form-title{font-family:'Lora',serif;font-size:24px;font-weight:700;letter-spacing:-.4px;margin-bottom:4px}
+.form-sub{font-size:13px;color:var(--ink3);margin-bottom:22px;line-height:1.5}
+label{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:5px;letter-spacing:.2px}
+input,select,textarea{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:var(--r);
+  font-family:'Manrope',sans-serif;font-size:14px;color:var(--ink);
+  background:var(--muted);outline:none;transition:all .2s;
+  margin-bottom:14px;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--green-m);background:var(--paper);
+  box-shadow:0 0 0 3px rgba(46,107,73,.1);
+}
+textarea{resize:none}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column}
+.fg input,.fg select,.fg textarea{margin:0}
+.err{
+  background:var(--red-lt);border:1px solid var(--red-bd);
+  border-radius:10px;padding:10px 14px;font-size:13px;color:var(--red);
+  margin-bottom:14px;display:none;
+}
+.submit-btn{
+  width:100%;padding:13px;border:none;border-radius:var(--r);
+  font-family:'Manrope',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .2s;color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.submit-btn.green{background:var(--green)}
+.submit-btn.green:hover{background:var(--green-m);transform:translateY(-1px);box-shadow:0 4px 20px rgba(28,66,48,.3)}
+.submit-btn.red{background:var(--red)}
+.submit-btn.red:hover{background:#a02020;transform:translateY(-1px)}
+.hint-box{
+  margin-top:14px;background:var(--muted);border:1px solid var(--border);
+  border-radius:var(--r);padding:12px 14px;
+  font-size:12px;color:var(--ink3);line-height:1.85;
+}
+.hint-box strong{color:var(--ink2)}
+
+/* ══ APP SHELL ══════════════════════════════════════════════ */
+#scr-app{display:none;height:100vh;flex-direction:column}
+#scr-app.on{display:flex}
+
+.topbar{
+  height:54px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;flex-shrink:0;z-index:10;
+}
+.topbar.green{background:var(--green);box-shadow:0 2px 16px rgba(28,66,48,.35)}
+.topbar.red  {background:var(--red);  box-shadow:0 2px 16px rgba(122,28,28,.35)}
+.tb-brand{display:flex;align-items:center;gap:10px}
+.tb-brand-text{color:#fff;font-family:'Lora',serif;font-size:18px;font-weight:700;letter-spacing:-.3px}
+.tb-pill{
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);
+  color:rgba(255,255,255,.85);font-size:11px;font-weight:700;
+  padding:3px 10px;border-radius:100px;letter-spacing:.2px;
+}
+.tb-right{display:flex;align-items:center;gap:10px}
+.tb-user-chip{
+  display:flex;align-items:center;gap:9px;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  border-radius:100px;padding:4px 14px 4px 5px;
+}
+.tb-av{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(255,255,255,.22);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:11px;font-weight:800;
+}
+.tb-name{font-size:13px;color:rgba(255,255,255,.9);font-weight:500}
+.tb-notif{
+  position:relative;width:34px;height:34px;border-radius:50%;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:15px;transition:background .2s;
+}
+.tb-notif:hover{background:rgba(255,255,255,.22)}
+.notif-dot{
+  position:absolute;top:5px;right:5px;
+  width:9px;height:9px;border-radius:50%;
+  background:#ef4444;border:1.5px solid;display:none;
+}
+.topbar.green .notif-dot{border-color:var(--green)}
+.topbar.red   .notif-dot{border-color:var(--red)}
+.tb-signout{
+  padding:6px 14px;border:1px solid rgba(255,255,255,.25);border-radius:9px;
+  background:transparent;color:rgba(255,255,255,.8);
+  font-size:12px;font-weight:600;cursor:pointer;font-family:'Manrope',sans-serif;transition:all .2s;
+}
+.tb-signout:hover{background:rgba(255,255,255,.12);color:#fff}
+
+/* LAYOUT */
+.app-body{flex:1;display:flex;overflow:hidden}
+.sidebar{
+  width:224px;flex-shrink:0;
+  background:var(--paper);border-right:1px solid var(--border);
+  padding:14px 10px;display:flex;flex-direction:column;gap:2px;
+  overflow-y:auto;
+}
+.snav{
+  padding:10px 13px;border-radius:11px;border:none;
+  background:transparent;color:var(--ink3);
+  font-size:13px;font-weight:600;cursor:pointer;
+  text-align:left;width:100%;transition:all .18s;
+  font-family:'Manrope',sans-serif;
+  display:flex;align-items:center;gap:10px;
+}
+.snav:hover{background:var(--muted);color:var(--ink2)}
+.snav.on.green-nav{background:var(--green-lt);color:var(--green)}
+.snav.on.red-nav  {background:var(--red-lt);  color:var(--red)}
+.snav-ico{font-size:16px;width:22px;text-align:center}
+.sidebar-foot{
+  margin-top:auto;padding:13px;background:var(--muted);
+  border-radius:var(--r);border:1px solid var(--border);
+  font-size:12px;color:var(--ink3);line-height:1.85;
+}
+.sidebar-foot strong{color:var(--ink2);display:block;font-size:13px;margin-bottom:2px}
+
+.content{flex:1;overflow-y:auto;padding:26px 30px}
+.pg{display:none;animation:fadein .22s ease}
+.pg.on{display:block}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.ph{margin-bottom:22px}
+.ph h2{font-family:'Lora',serif;font-size:26px;font-weight:700;letter-spacing:-.4px}
+.ph p{font-size:13px;color:var(--ink3);margin-top:4px;line-height:1.5}
+
+/* CARDS */
+.card{
+  background:var(--paper);border:1px solid var(--border);
+  border-radius:var(--R);padding:22px 24px;margin-bottom:16px;
+  box-shadow:var(--sh);
+}
+.card-title{font-family:'Lora',serif;font-size:16px;font-weight:700;margin-bottom:16px;color:var(--ink2)}
+
+/* ── HOSPITAL CARDS ── */
+.hosp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:20px}
+.hosp-card{
+  background:var(--paper);border:1.5px solid var(--border);
+  border-radius:var(--R);padding:20px;cursor:pointer;transition:all .22s;
+  position:relative;overflow:hidden;
+}
+.hosp-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--green),var(--green-m));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;
+}
+.hosp-card:hover{border-color:var(--green-bd);box-shadow:0 6px 28px rgba(28,66,48,.1);transform:translateY(-3px)}
+.hosp-card:hover::before{transform:scaleX(1)}
+.hosp-card.selected{border-color:var(--green);background:var(--green-lt);box-shadow:0 6px 28px rgba(28,66,48,.15)}
+.hosp-card.selected::before{transform:scaleX(1)}
+.hc-top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.hc-icon{
+  width:48px;height:48px;border-radius:14px;
+  background:var(--green-lt);border:1px solid var(--green-bd);
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;
+}
+.hc-name{font-family:'Lora',serif;font-size:16px;font-weight:700;margin-bottom:2px}
+.hc-addr{font-size:12px;color:var(--ink3)}
+.hc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.hc-tag{background:var(--muted);border:1px solid var(--border);border-radius:100px;padding:3px 10px;font-size:11px;color:var(--ink3);font-weight:600}
+.hc-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11.5px;color:var(--ink3)}
+.hc-meta-item{display:flex;align-items:center;gap:5px}
+.hc-btn{
+  width:100%;margin-top:14px;padding:10px;border:none;
+  border-radius:10px;background:var(--green);color:#fff;
+  font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;
+}
+.hc-btn:hover{background:var(--green-m)}
+
+/* ── BOOKING FORM ── */
+.book-hosp-banner{
+  background:var(--green-lt);border:1px solid var(--green-bd);
+  border-radius:var(--r);padding:14px 16px;margin-bottom:18px;
+  display:flex;align-items:center;gap:12px;
+}
+.book-hosp-banner .bhi{font-size:22px}
+.book-hosp-banner h4{font-size:14px;font-weight:700;color:var(--green)}
+.book-hosp-banner p{font-size:12px;color:var(--green);opacity:.8;margin-top:2px}
+
+/* ── APT STATUS CARDS ── */
+.acard{
+  background:var(--paper);border:1px solid var(--border);
+  border-radius:var(--R);padding:18px 20px;margin-bottom:12px;
+  position:relative;overflow:hidden;box-shadow:var(--sh);transition:box-shadow .2s;
+}
+.acard:hover{box-shadow:var(--sh2)}
+.acard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px}
+.acard.waiting::before   {background:var(--amber)}
+.acard.confirmed::before {background:var(--blue)}
+.acard.in_progress::before{background:var(--green-m)}
+.acard.completed::before {background:#065f46}
+.acard.cancelled::before {background:var(--border2)}
+.acard-grid{display:grid;grid-template-columns:1fr auto;gap:14px}
+.a-id{font-size:10.5px;color:var(--ink4);font-family:monospace;margin-bottom:4px;letter-spacing:.5px}
+.a-name{font-family:'Lora',serif;font-size:17px;font-weight:700;margin-bottom:3px}
+.a-meta{font-size:12px;color:var(--ink3);line-height:1.85}
+.a-reason{margin-top:10px;padding:9px 12px;background:var(--muted);border-radius:10px;font-size:13px;color:var(--ink2);line-height:1.6;border:1px solid var(--border)}
+.a-symp{margin-top:6px;padding:9px 12px;background:var(--red-lt);border-radius:10px;font-size:12.5px;color:var(--red);border:1px solid var(--red-bd)}
+.a-acts{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+
+/* STATUS BADGE */
+.sbadge{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;white-space:nowrap}
+.sbadge.waiting   {background:var(--amber-lt);color:var(--amber);border:1px solid var(--amber-bd)}
+.sbadge.confirmed {background:var(--blue-lt); color:var(--blue); border:1px solid var(--blue-bd)}
+.sbadge.in_progress{background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd)}
+.sbadge.completed {background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7}
+.sbadge.cancelled {background:var(--muted);color:var(--ink4);border:1px solid var(--border)}
+
+/* BUTTONS */
+.btn{
+  padding:9px 18px;border-radius:11px;border:none;cursor:pointer;
+  font-family:'Manrope',sans-serif;font-size:13px;font-weight:700;
+  transition:all .2s;display:inline-flex;align-items:center;gap:7px;
+}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:var(--green-m);transform:translateY(-1px)}
+.btn-red{background:var(--red);color:#fff}
+.btn-red:hover{background:#a02020;transform:translateY(-1px)}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover{background:#1a4a9a;transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--ink2)}
+.btn-outline:hover{border-color:var(--green);color:var(--green);background:var(--green-lt)}
+.btn-danger{background:#dc2626;color:#fff}
+.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:7px 14px;font-size:12px;border-radius:9px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none !important}
+
+/* NOTIFICATIONS */
+.notif-banner{border-radius:14px;padding:15px 18px;margin-bottom:14px;display:flex;align-items:flex-start;gap:14px;animation:fadein .3s ease}
+.nb-success{background:var(--green-lt);border:1px solid var(--green-bd)}
+.nb-info   {background:var(--blue-lt); border:1px solid var(--blue-bd)}
+.nb-warn   {background:var(--amber-lt);border:1px solid var(--amber-bd)}
+.nb-ico{font-size:20px;flex-shrink:0;margin-top:2px}
+.nb-body{flex:1}
+.nb-body strong{display:block;font-size:14px;font-weight:700;margin-bottom:4px}
+.nb-body p{font-size:13px;line-height:1.6;font-weight:400}
+.nb-success .nb-body strong,.nb-success .nb-body p{color:var(--green)}
+.nb-info    .nb-body strong,.nb-info    .nb-body p{color:var(--blue)}
+.nb-warn    .nb-body strong,.nb-warn    .nb-body p{color:var(--amber)}
+
+/* ── CHAT ── */
+.chat-layout{display:grid;grid-template-columns:200px 1fr;gap:16px;height:calc(100vh - 158px)}
+.chat-aside{display:flex;flex-direction:column;gap:10px}
+.qbtn{
+  width:100%;padding:10px 13px;background:var(--paper);border:1px solid var(--border);
+  border-radius:11px;text-align:left;cursor:pointer;
+  font-size:12.5px;color:var(--ink2);font-weight:600;
+  font-family:'Manrope',sans-serif;transition:all .18s;
+  display:flex;align-items:center;gap:8px;
+}
+.qbtn:hover{border-color:var(--green-bd);background:var(--green-lt);color:var(--green)}
+.chat-win{background:var(--paper);border:1px solid var(--border);border-radius:var(--R);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--sh)}
+.chat-hd{padding:13px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.bot-ava{width:36px;height:36px;border-radius:10px;background:var(--green-lt);border:1px solid var(--green-bd);display:flex;align-items:center;justify-content:center;font-size:18px}
+.bot-pulse{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 2s ease infinite;display:inline-block}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.msgs-wrap{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;gap:9px;max-width:82%;animation:fadein .18s ease}
+.msg.u{flex-direction:row-reverse;align-self:flex-end}
+.mav{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.msg.b .mav{background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd)}
+.msg.u .mav{background:var(--muted);color:var(--ink2);border:1px solid var(--border)}
+.mbub{padding:11px 15px;border-radius:13px;font-size:13.5px;line-height:1.65}
+.msg.b .mbub{background:var(--muted);border:1px solid var(--border);border-top-left-radius:3px;color:var(--ink2)}
+.msg.u .mbub{background:var(--green);color:#fff;border-top-right-radius:3px}
+.typing{display:flex;gap:4px;align-items:center}
+.typing span{width:6px;height:6px;border-radius:50%;background:var(--ink4);animation:bobb 1.2s ease infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bobb{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.chat-foot{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end}
+.cinput{
+  flex:1;padding:11px 14px;border:1.5px solid var(--border);border-radius:12px;
+  font-family:'Manrope',sans-serif;font-size:13.5px;resize:none;
+  outline:none;background:var(--muted);color:var(--ink);
+  max-height:96px;transition:border-color .2s;
+}
+.cinput:focus{border-color:var(--green-m);background:var(--paper)}
+.cinput::placeholder{color:var(--ink4)}
+.csend-btn{
+  width:40px;height:40px;border:none;border-radius:11px;
+  background:var(--green);color:#fff;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;
+}
+.csend-btn:hover{background:var(--green-m);transform:scale(1.06)}
+.csend-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.chat-suggest{margin:0 18px 10px;background:var(--green-lt);border:1px solid var(--green-bd);border-radius:11px;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--green);animation:fadein .3s ease}
+
+/* ── VIDEO ── */
+.video-wrap{display:grid;grid-template-columns:1fr 290px;gap:16px;height:calc(100vh - 158px)}
+.vscreen{background:#07090c;border-radius:var(--R);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--sh2)}
+.vstage{flex:1;position:relative;display:flex;align-items:center;justify-content:center}
+#rdiv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+#rdiv video{width:100%;height:100%;object-fit:cover}
+#ldiv{position:absolute;bottom:12px;right:12px;width:134px;height:90px;border-radius:10px;overflow:hidden;border:2px solid rgba(255,255,255,.18);background:#111}
+#ldiv video{width:100%;height:100%;object-fit:cover}
+.v-idle-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;height:100%;color:#3a3a3a}
+.v-idle-state .ico{font-size:50px;opacity:.5}
+.v-idle-state h3{font-family:'Lora',serif;font-size:18px;color:#555}
+.v-idle-state p{font-size:12px;color:#444;text-align:center;max-width:200px;line-height:1.6}
+.v-spin-state{display:none;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:14px}
+.v-spinner{width:42px;height:42px;border:3px solid rgba(255,255,255,.08);border-top-color:#22c55e;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.v-active-state{display:none;width:100%;height:100%;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.vctrl{
+  padding:12px 18px;display:flex;align-items:center;justify-content:center;gap:11px;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(10px);
+  border-radius:16px;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  z-index:10;box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+.vbtn{width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.1);color:#fff;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.vbtn:hover{background:rgba(255,255,255,.22);transform:scale(1.05)}
+.vbtn.muted{background:rgba(220,38,38,.25);border-color:rgba(220,38,38,.4)}
+.vbtn.end{background:#dc2626;border-color:#dc2626;width:54px;font-size:18px}
+.vbtn.end:hover{background:#b91c1c}
+.vside{display:flex;flex-direction:column;gap:13px}
+
+/* ── DOCTOR QUEUE ── */
+.dq-card{background:var(--paper);border:1px solid var(--border);border-radius:var(--R);padding:18px 20px;margin-bottom:12px;display:grid;grid-template-columns:1fr auto;gap:14px;box-shadow:var(--sh);transition:box-shadow .2s}
+.dq-card:hover{box-shadow:var(--sh2)}
+.dq-card.urgent{border-color:var(--red-bd);background:var(--red-lt)}
+.college-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-lt);color:var(--green);border:1px solid var(--green-bd);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700}
+.urgent-badge{background:var(--red-lt);color:var(--red);border:1px solid var(--red-bd);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700}
+
+/* ── HOME QUICK ACTIONS ── */
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.hq-card{background:var(--paper);border:1px solid var(--border);border-radius:var(--R);padding:20px 22px;cursor:pointer;transition:all .22s}
+.hq-card:hover{transform:translateY(-3px);box-shadow:var(--sh);border-color:var(--green-bd)}
+.hq-ico{font-size:28px;margin-bottom:12px}
+.hq-card h3{font-family:'Lora',serif;font-size:16px;font-weight:700;margin-bottom:5px}
+.hq-card p{font-size:12.5px;color:var(--ink3);line-height:1.6}
+
+/* STAT BOXES */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.stat-box{background:var(--paper);border:1px solid var(--border);border-radius:var(--R);padding:16px 18px}
+.stat-box .n{font-family:'Lora',serif;font-size:34px;font-weight:700;line-height:1;margin-bottom:4px}
+.stat-box .l{font-size:12px;color:var(--ink3);font-weight:600}
+
+/* MODAL */
+.moverlay{position:fixed;inset:0;background:rgba(23,19,16,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px)}
+.moverlay.on{display:flex}
+.mbox{background:var(--paper);border-radius:22px;padding:28px 30px;width:100%;max-width:520px;animation:fadein .25s ease;box-shadow:var(--sh2);border:1px solid var(--border);max-height:90vh;overflow-y:auto}
+.mhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.mhd h3{font-family:'Lora',serif;font-size:20px;font-weight:700;letter-spacing:-.3px}
+.mcl{width:30px;height:30px;border:1px solid var(--border2);border-radius:8px;background:var(--muted);cursor:pointer;font-size:16px;color:var(--ink3);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mcl:hover{border-color:var(--green);color:var(--ink)}
+
+/* ── BOOKING SUCCESS MODAL ── */
+.apt-id-block{background:var(--green-lt);border:1px solid var(--green-bd);border-radius:var(--r);padding:16px;text-align:center;margin-bottom:16px}
+.apt-id-block span{font-size:11px;font-weight:700;color:var(--green);letter-spacing:.4px;text-transform:uppercase;display:block;margin-bottom:6px}
+.apt-id-block code{font-family:monospace;font-size:24px;font-weight:800;color:var(--green);letter-spacing:3px}
+.apt-detail-block{background:var(--muted);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;font-size:13.5px;color:var(--ink2);line-height:2.1}
+.apt-detail-block strong{color:var(--ink);font-weight:700}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--ink);color:#fff;padding:12px 18px;border-radius:12px;font-size:13.5px;z-index:999;transform:translateY(50px);opacity:0;transition:all .26s;box-shadow:0 4px 24px rgba(0,0,0,.28);max-width:300px}
+.toast.on{transform:translateY(0);opacity:1}
+
+/* DOC CONFIRM MODAL */
+.dconf-detail{background:var(--muted);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;font-size:13.5px;line-height:2.1;color:var(--ink2)}
+.dconf-detail strong{color:var(--ink);font-weight:700}
+
+@media(max-width:900px){
+  .auth-panel{display:none}
+  .chat-layout,.video-wrap{grid-template-columns:1fr;height:auto}
+  .chat-aside,.vside{display:none}
+  .home-grid,.hosp-grid{grid-template-columns:1fr}
+  .stat-row{grid-template-columns:repeat(2,1fr)}
+  .fgrid{grid-template-columns:1fr}
+  .sidebar{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ AUTH SCREEN ════════════ -->
+<div id="scr-auth">
+  <div class="auth-panel">
+    <div class="ap-logo">
+      <div class="ap-logo-icon">🏥</div>
+      <h1>CampusCare</h1>
+    </div>
+    <div class="ap-hero">
+      <h2>Your campus health, now online</h2>
+      <p>Hostel students — log in to see your college's tied-up hospitals and consult a doctor via live video, instantly.</p>
+    </div>
+    <div class="ap-flow">
+      <div class="ap-step">
+        <div class="ap-step-n">1</div>
+        <div class="ap-step-body">
+          <strong>Log in or sign up</strong>
+          <span>Use your college details to register</span>
+        </div>
+      </div>
+      <div class="ap-step">
+        <div class="ap-step-n">2</div>
+        <div class="ap-step-body">
+          <strong>See your linked hospitals</strong>
+          <span>Hospitals tied to your college appear automatically</span>
+        </div>
+      </div>
+      <div class="ap-step">
+        <div class="ap-step-n">3</div>
+        <div class="ap-step-body">
+          <strong>Book an appointment</strong>
+          <span>Doctor gets notified with your details instantly</span>
+        </div>
+      </div>
+      <div class="ap-step">
+        <div class="ap-step-n">4</div>
+        <div class="ap-step-body">
+          <strong>Doctor confirms &amp; joins video</strong>
+          <span>Live Twilio Video consultation from anywhere</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="auth-form-area">
+    <div class="auth-box">
+      <div class="role-switch">
+        <button class="rs-btn on" id="rs-student" onclick="setAuthRole('student')">🎓 Student</button>
+        <button class="rs-btn" id="rs-doctor" onclick="setAuthRole('doctor')">👨‍⚕️ Doctor</button>
+      </div>
+
+      <!-- STUDENT AREA -->
+      <div id="student-area">
+        <div class="tab-switch">
+          <button class="ts-btn on" id="ts-login" onclick="authTab('login')">Log in</button>
+          <button class="ts-btn" id="ts-signup" onclick="authTab('signup')">Sign up</button>
+        </div>
+
+        <!-- LOGIN -->
+        <div id="f-login">
+          <h2 class="form-title">Welcome back</h2>
+          <p class="form-sub">Sign in to your student account</p>
+          <div class="err" id="login-err"></div>
+          <label>Student ID</label>
+          <input id="l-id" placeholder="e.g. STU001" autocomplete="username"/>
+          <label>Password</label>
+          <input id="l-pw" type="password" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+          <button class="submit-btn green" onclick="doLogin()">Sign in →</button>
+          <div class="hint-box">
+            <strong>Demo students:</strong> STU001/pass123 &nbsp;·&nbsp; STU002/pass123<br>
+            STU003/pass123 (VIT) &nbsp;·&nbsp; STU004/pass123 (COEP)<br>
+            <span style="opacity:.7">Or click Sign up to create a new account</span>
+          </div>
+        </div>
+
+        <!-- SIGN UP -->
+        <div id="f-signup" style="display:none">
+          <h2 class="form-title">Create account</h2>
+          <p class="form-sub">Register as a hostel student</p>
+          <div class="err" id="signup-err"></div>
+          <div class="fgrid">
+            <div class="fg"><label>First name</label><input id="s-fn" placeholder="Nitish"/></div>
+            <div class="fg"><label>Last name</label><input id="s-ln" placeholder="Sharma"/></div>
+          </div>
+          <div style="height:12px"></div>
+          <label>Student ID</label>
+          <input id="s-id" placeholder="e.g. STU005" autocomplete="username"/>
+          <label>College</label>
+          <select id="s-col">
+            <option value="">Select your college</option>
+            <option>MIT Pune</option>
+            <option>VIT Pune</option>
+            <option>COEP Pune</option>
+            <option>PICT Pune</option>
+            <option>SPPU Pune</option>
+            <option>CMR University</option>
+          </select>
+          <div class="fgrid">
+            <div class="fg"><label>Year &amp; Branch</label><input id="s-yr" placeholder="3rd Year CSE"/></div>
+            <div class="fg"><label>Hostel Block</label><input id="s-hostel" placeholder="HB-12 (optional)"/></div>
+          </div>
+          <div style="height:12px"></div>
+          <label>Password</label>
+          <input id="s-pw" type="password" placeholder="Min 6 characters" onkeydown="if(event.key==='Enter')doSignup()"/>
+          <button class="submit-btn green" onclick="doSignup()">Create account →</button>
+        </div>
+      </div>
+
+      <!-- DOCTOR AREA -->
+      <div id="doctor-area" style="display:none">
+        <h2 class="form-title">Doctor portal</h2>
+        <p class="form-sub">City General Hospital — receive student appointment notifications</p>
+        <div class="err" id="doc-err"></div>
+        <label>Doctor ID</label>
+        <input id="d-id" placeholder="e.g. DOC001"/>
+        <label>Password</label>
+        <input id="d-pw" type="password" placeholder="Your password" onkeydown="if(event.key==='Enter')doDocLogin()"/>
+        <button class="submit-btn red" onclick="doDocLogin()">Sign in →</button>
+        <div class="hint-box">
+          <strong>Demo doctors:</strong> DOC001/doc123 · DOC002/doc123 · DOC003/doc123<br>
+          DOC004/doc123 (Sunrise) · DOC006/doc123 (Pune Wellness)
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ APP SCREEN ════════════ -->
+<div id="scr-app">
+  <div class="topbar green" id="topbar">
+    <div class="tb-brand">
+      <div class="tb-brand-text">🏥 CampusCare</div>
+      <div class="tb-pill" id="tb-pill">Student</div>
+    </div>
+    <div class="tb-right">
+      <div class="tb-notif" id="tb-notif-btn" onclick="toggleNotifPanel()" title="Notifications">
+        🔔
+        <div class="notif-dot" id="notif-dot"></div>
+      </div>
+      <div class="tb-user-chip">
+        <div class="tb-av" id="tb-av">?</div>
+        <span class="tb-name" id="tb-name"></span>
+      </div>
+      <button class="tb-signout" onclick="signout()">Sign out</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="moverlay" id="modal"><div class="mbox" id="mbox"></div></div>
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── GLOBALS ───────────────────────────────────────────────────────
+const API = 'http://localhost:5000';
+let TOKEN = '', CU = null;
+let APTS = [], NOTIFS = [];
+let twilioRoom = null, lTracks = [], dTracks = [];
+let micOn = true, camOn = true, dMicOn = true, dCamOn = true;
+let chatIdx = 0, nudgeDone = false;
+
+const BOT_FALLBACK = [
+  "I understand you're not feeling well. Could you tell me more about when this started and how severe it is on a scale of 1–10?",
+  "Thank you for sharing that. Based on your symptoms, it could be a viral infection, stress, or fatigue. Have you had fever, body aches, or trouble sleeping?",
+  "Given what you've described, it would be a good idea to consult a doctor. I can see the hospitals linked to your college — would you like to book an appointment with a General Ward doctor?",
+  "For any emergency (severe chest pain, difficulty breathing, unconsciousness) please call 112 immediately. For your current concern, booking a video consultation is the right next step."
+];
+
+const $ = id => document.getElementById(id);
+const api = (path, opts = {}) => fetch(API + path, {
+  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + TOKEN },
+  ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined
+}).then(r => r.json());
+
+function toast(msg, d = 3000) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); setTimeout(() => t.classList.remove('on'), d) }
+function openModal(h) { $('mbox').innerHTML = h; $('modal').classList.add('on') }
+function closeModal() { $('modal').classList.remove('on') }
+$('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal() });
+function inits(n) { return (n || '').split(' ').map(w => w[0]).join('').substr(0, 2).toUpperCase() }
+function fmtDT(iso) { if (!iso) return '—'; return new Date(iso).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) }
+function setErr(id, msg) { const e = $(id); if (e) { e.textContent = msg; e.style.display = 'block' } }
+function clrErr(id) { const e = $(id); if (e) e.style.display = 'none' }
+
+// ── AUTH ──────────────────────────────────────────────────────────
+function setAuthRole(r) {
+  $('rs-student').classList.toggle('on', r === 'student');
+  $('rs-doctor').classList.toggle('on', r === 'doctor');
+  $('student-area').style.display = r === 'student' ? 'block' : 'none';
+  $('doctor-area').style.display  = r === 'doctor'  ? 'block' : 'none';
+}
+function authTab(t) {
+  $('ts-login').classList.toggle('on', t === 'login');
+  $('ts-signup').classList.toggle('on', t === 'signup');
+  $('f-login').style.display  = t === 'login'  ? 'block' : 'none';
+  $('f-signup').style.display = t === 'signup' ? 'block' : 'none';
+  clrErr('login-err'); clrErr('signup-err');
+}
+
+async function doLogin() {
+  clrErr('login-err');
+  const id = $('l-id').value.trim().toUpperCase(), pw = $('l-pw').value;
+  if (!id || !pw) { setErr('login-err', 'Enter your Student ID and password'); return }
+  try {
+    const d = await api('/api/login', { method: 'POST', body: { user_id: id, password: pw } });
+    if (d.error) { setErr('login-err', d.error); return }
+    TOKEN = d.token; CU = d; launchApp();
+  } catch (e) { setErr('login-err', 'Cannot reach server — run: python app.py') }
+}
+
+async function doSignup() {
+  clrErr('signup-err');
+  const fn = $('s-fn').value.trim(), ln = $('s-ln').value.trim();
+  const id = $('s-id').value.trim().toUpperCase();
+  const col = $('s-col').value, yr = $('s-yr').value.trim(), pw = $('s-pw').value;
+  const hostel = $('s-hostel').value.trim();
+  if (!fn || !ln || !id || !col || !yr || !pw) { setErr('signup-err', 'Please fill all required fields'); return }
+  if (pw.length < 6) { setErr('signup-err', 'Password must be at least 6 characters'); return }
+  try {
+    const d = await api('/api/signup', { method: 'POST', body: { user_id: id, name: fn + ' ' + ln, college: col, year: yr, hostel, password: pw } });
+    if (d.error) { setErr('signup-err', d.error); return }
+    TOKEN = d.token; CU = d; launchApp();
+  } catch (e) { setErr('signup-err', 'Cannot reach server — run: python app.py') }
+}
+
+async function doDocLogin() {
+  clrErr('doc-err');
+  const id = $('d-id').value.trim().toUpperCase(), pw = $('d-pw').value;
+  if (!id || !pw) { setErr('doc-err', 'Enter Doctor ID and password'); return }
+  try {
+    const d = await api('/api/login', { method: 'POST', body: { user_id: id, password: pw } });
+    if (d.error) { setErr('doc-err', d.error); return }
+    if (d.role !== 'doctor') { setErr('doc-err', 'Not a doctor account. Use the Student tab.'); return }
+    TOKEN = d.token; CU = d; launchApp();
+  } catch (e) { setErr('doc-err', 'Cannot reach server — run: python app.py') }
+}
+
+function signout() {
+  TOKEN = ''; CU = null;
+  if (twilioRoom) { twilioRoom.disconnect(); twilioRoom = null }
+  lTracks.forEach(t => t.stop()); lTracks = [];
+  dTracks.forEach(t => t.stop()); dTracks = [];
+  $('scr-auth').style.display = 'flex';
+  $('scr-app').classList.remove('on');
+  ['l-id', 'l-pw', 'd-id', 'd-pw'].forEach(id => { if ($(id)) $(id).value = '' });
+  chatIdx = 0; nudgeDone = false;
+}
+
+// ── APP SHELL ─────────────────────────────────────────────────────
+function launchApp() {
+  $('scr-auth').style.display = 'none';
+  $('scr-app').classList.add('on');
+  $('tb-name').textContent = CU.name;
+  $('tb-av').textContent   = inits(CU.name);
+  const isDoc = CU.role === 'doctor';
+  $('topbar').className = 'topbar ' + (isDoc ? 'red' : 'green');
+  $('tb-pill').textContent = isDoc ? ('🏥 ' + CU.hospital_name) : ('🎓 ' + CU.college);
+  buildSidebar();
+  buildContent();
+  if (isDoc) pollNotifs();
+}
+
+function buildSidebar() {
+  const s = $('sidebar'), isDoc = CU.role === 'doctor';
+  s.innerHTML = '';
+  const nav = (id, ico, lbl) => {
+    const b = document.createElement('button');
+    b.className = 'snav ' + (isDoc ? 'red-nav' : 'green-nav');
+    b.id = 'sn-' + id;
+    b.innerHTML = `<span class="snav-ico">${ico}</span>${lbl}`;
+    b.onclick = () => goTab(id);
+    s.appendChild(b);
+  };
+  if (isDoc) {
+    nav('notifs', '🔔', 'Notifications');
+    nav('queue',  '📋', 'Patient queue');
+    nav('cases',  '🗂', 'My cases');
+    nav('dvideo', '📹', 'Video call');
+    const f = document.createElement('div'); f.className = 'sidebar-foot';
+    f.innerHTML = `<strong>${CU.specialty || 'General Medicine'}</strong>${CU.hospital_name || 'City General Hospital'}`;
+    s.appendChild(f);
+  } else {
+    nav('home',  '🏠', 'Home');
+    nav('hosps', '🏥', 'My hospitals');
+    nav('book',  '📅', 'Book appointment');
+    nav('apts',  '🗂', 'My appointments');
+    nav('chat',  '💬', 'MedBot AI');
+    nav('video', '📹', 'Video call');
+    const f = document.createElement('div'); f.className = 'sidebar-foot';
+    const h = (CU.hospitals || [])[0] || {};
+    f.innerHTML = `<strong>${h.name || 'City General Hospital'}</strong>${h.address || 'General Ward'}`;
+    s.appendChild(f);
+  }
+}
+
+function buildContent() {
+  $('content').innerHTML = CU.role === 'doctor' ? doctorHTML() : studentHTML();
+  goTab(CU.role === 'doctor' ? 'notifs' : 'home');
+}
+
+function goTab(id) {
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.snav').forEach(b => b.classList.remove('on'));
+  const pg = $('pg-' + id), bn = $('sn-' + id);
+  if (pg) pg.classList.add('on');
+  if (bn) bn.classList.add('on');
+  if (id === 'home')   renderHome();
+  if (id === 'hosps')  renderHosps();
+  if (id === 'apts')   loadAndRenderApts();
+  if (id === 'queue')  loadQueue();
+  if (id === 'cases')  loadCases();
+  if (id === 'notifs') loadNotifs();
+  if (id === 'video')  renderVideoHint();
+}
+
+// ── STUDENT HTML ─────────────────────────────────────────────────
+function studentHTML() {
+  return `
+  <div id="pg-home"  class="pg"></div>
+  <div id="pg-hosps" class="pg"></div>
+  <div id="pg-book"  class="pg"></div>
+
+  <div id="pg-apts" class="pg">
+    <div class="ph"><h2>My appointments</h2><p>Track your consultations with tied-up hospitals</p></div>
+    <div id="apts-list"></div>
+  </div>
+
+  <div id="pg-chat" class="pg">
+    <div class="chat-layout">
+      <div class="chat-win" style="grid-column:1/-1;max-width:900px;margin:0 auto;width:100%">
+        <div class="chat-hd">
+          <div class="bot-ava">🤖</div>
+          <div>
+            <div style="font-family:'Lora',serif;font-weight:700;font-size:15px">MedBot — Health AI</div>
+            <div style="font-size:11.5px;color:var(--ink3);display:flex;align-items:center;gap:6px"><span class="bot-pulse"></span>Online · linked to your hospitals</div>
+          </div>
+        </div>
+        <div class="msgs-wrap" id="msgs"></div>
+        <div id="chat-suggest" style="display:none"></div>
+        <div class="chat-foot">
+          <textarea class="cinput" id="cin" rows="1" placeholder="Describe your symptoms…"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat()}"
+            oninput="autoH(this)"></textarea>
+          <button class="csend-btn" id="csend" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pg-video" class="pg">
+    <div class="ph"><h2>Video consultation</h2><p>Join your live Twilio Video call with the doctor</p></div>
+    <div id="vid-hint"></div>
+    ${videoHTML('s')}
+  </div>`;
+}
+
+// ── DOCTOR HTML ──────────────────────────────────────────────────
+function doctorHTML() {
+  return `
+  <div id="pg-notifs" class="pg">
+    <div class="ph"><h2>Notifications</h2><p>New appointment requests sent to you</p></div>
+    <div id="notifs-list"></div>
+  </div>
+  <div id="pg-queue" class="pg">
+    <div class="ph"><h2>Patient queue</h2><p>All appointments at ${CU.hospital_name || 'your hospital'}</p></div>
+    <div class="stat-row" id="d-stats">
+      <div class="stat-box"><div class="n" id="ds-w">0</div><div class="l">Waiting</div></div>
+      <div class="stat-box"><div class="n" id="ds-c">0</div><div class="l">Confirmed</div></div>
+      <div class="stat-box"><div class="n" id="ds-d">0</div><div class="l">Done</div></div>
+      <div class="stat-box"><div class="n" id="ds-t">0</div><div class="l">Total</div></div>
+    </div>
+    <div id="queue-list"></div>
+  </div>
+  <div id="pg-cases" class="pg">
+    <div class="ph"><h2>My cases</h2><p>Appointments you have confirmed</p></div>
+    <div id="cases-list"></div>
+  </div>
+  <div id="pg-dvideo" class="pg">
+    <div class="ph"><h2>Video call</h2><p>Start your Twilio Video consultation with the student</p></div>
+    ${videoHTML('d')}
+  </div>`;
+}
+
+// ── VIDEO HTML ───────────────────────────────────────────────────
+function videoHTML(side) {
+  const isDoc = side === 'd';
+  const prefix = isDoc ? 'd' : 's';
+  return `
+  <div class="video-wrap">
+    <div class="vscreen">
+      <div class="vstage">
+        <div class="v-idle-state" id="${prefix}-v-idle">
+          <div class="ico">📹</div>
+          <h3>Ready to connect</h3>
+          <p>Enter the appointment room name →</p>
+        </div>
+        <div class="v-spin-state" id="${prefix}-v-spin">
+          <div class="v-spinner" style="${isDoc ? 'border-top-color:#ef4444' : ''}"></div>
+          <div style="color:#666;font-size:13px">Connecting via Twilio…</div>
+        </div>
+        <div class="v-active-state" id="${prefix}-v-active">
+          <div id="${isDoc ? 'drdiv' : 'rdiv'}" style="display:none"></div>
+          <div id="${isDoc ? 'dldiv' : 'ldiv'}" style="display:none"></div>
+          <div id="${prefix}-v-remote-ph" style="text-align:center">
+            <div style="font-size:40px">${isDoc ? '🎓' : '👨‍⚕️'}</div>
+            <div style="color:#888;font-size:13px;margin-top:8px" id="${prefix}-v-partner">${isDoc ? 'Waiting for student…' : 'Waiting for doctor…'}</div>
+          </div>
+        </div>
+      </div>
+      <div class="vctrl" id="${prefix}-v-ctrl" style="display:none">
+        <button class="vbtn" id="${prefix}-v-mic" onclick="${isDoc ? 'dTMic' : 'sMic'}()">🎤</button>
+        <button class="vbtn" id="${prefix}-v-cam" onclick="${isDoc ? 'dTCam' : 'sCam'}()">📷</button>
+        <button class="vbtn end" onclick="${isDoc ? 'dEndCall' : 'sEndCall'}()">📵</button>
+      </div>
+    </div>
+    <div class="vside">
+      <div class="card">
+        <div class="card-title" style="font-size:14px">${isDoc ? 'Start call' : 'Join call'}</div>
+        <label>Room name (Appointment ID)</label>
+        <input id="${prefix}-v-room" placeholder="e.g. cc-apt1a2b3c" style="margin-bottom:10px"/>
+        <button class="btn ${isDoc ? 'btn-red' : 'btn-green'} btn-sm" id="${prefix}-v-join" onclick="${isDoc ? 'dJoinCall' : 'sJoinCall'}()" style="width:100%;padding:12px">
+          ${isDoc ? '📹 Start video call' : '📹 Join call'}
+        </button>
+      </div>
+      <div class="card" id="${prefix}-v-info" style="display:none">
+        <div class="card-title" style="font-size:13px">📡 Call info</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:2">
+          Room: <span id="${prefix}-v-rname" style="font-family:monospace;color:var(--ink)"></span><br>
+          You: <span id="${prefix}-v-idname" style="color:var(--ink)"></span><br>
+          <span id="${prefix}-v-pname">—</span>
+        </div>
+      </div>
+      <div class="card" style="background:var(--green-lt);border-color:var(--green-bd)">
+        <div style="font-size:12px;color:var(--green);line-height:2;font-weight:600">
+          ✅ Allow camera &amp; microphone<br>
+          ✅ Chrome or Firefox recommended<br>
+          🔒 Encrypted via Twilio SRTP
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── HOME PAGE ────────────────────────────────────────────────────
+async function renderHome() {
+  const el = $('pg-home'); if (!el) return;
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  let notifHtml = '';
+  try {
+    APTS = await api('/api/appointments');
+    const active = APTS.filter(a => a.status === 'confirmed');
+    const waiting = APTS.filter(a => a.status === 'waiting');
+    if (active.length) {
+      const a = active[0];
+      notifHtml += `<div class="notif-banner nb-success">
+        <div class="nb-ico">🟢</div>
+        <div class="nb-body">
+          <strong>Doctor confirmed — ${a.doctor_name} is ready</strong>
+          <p>Join the video call now. Room: <code style="font-family:monospace;background:rgba(0,0,0,.06);padding:1px 6px;border-radius:4px">${a.room_name}</code></p>
+        </div>
+        <button class="btn btn-green btn-sm" onclick="goTab('video');setTimeout(()=>{if($('s-v-room'))$('s-v-room').value='${a.room_name}'},200)" style="flex-shrink:0">Join →</button>
+      </div>`;
+    }
+    if (waiting.length) {
+      notifHtml += `<div class="notif-banner nb-warn">
+        <div class="nb-ico">⏳</div>
+        <div class="nb-body">
+          <strong>${waiting.length} appointment${waiting.length > 1 ? 's' : ''} waiting</strong>
+          <p>A doctor at your hospital will confirm shortly.</p>
+        </div>
+      </div>`;
+    }
+  } catch (e) {}
+
+  el.innerHTML = `
+    <div class="ph"><h2>${greet}, ${CU.name.split(' ')[0]} 👋</h2><p>${CU.college} · ${CU.year || ''} · Hostel ${CU.hostel || ''}</p></div>
+    ${notifHtml}
+    <div class="home-grid">
+      <div class="hq-card" onclick="goTab('hosps')">
+        <div class="hq-ico">🏥</div><h3>My hospitals</h3><p>See the hospitals linked to your college</p>
+      </div>
+      <div class="hq-card" onclick="goTab('book')">
+        <div class="hq-ico">📅</div><h3>Book appointment</h3><p>Request a consultation — doctor gets notified</p>
+      </div>
+      <div class="hq-card" onclick="goTab('apts')">
+        <div class="hq-ico">🗂</div><h3>My appointments</h3><p>Track your consultation status</p>
+      </div>
+      <div class="hq-card" onclick="goTab('chat')">
+        <div class="hq-ico">🤖</div><h3>MedBot AI</h3><p>Describe symptoms — AI triage before consulting</p>
+      </div>
+    </div>`;
+
+  const msgs = $('msgs');
+  if (msgs && !msgs.children.length) {
+    addMsg('b', `Hi ${CU.name.split(' ')[0]}! I'm MedBot, your health assistant. Describe your symptoms and I'll guide you — and can suggest booking a consultation with one of your linked hospitals. 🏥`);
+  }
+}
+
+// ── HOSPITALS PAGE ───────────────────────────────────────────────
+async function renderHosps() {
+  const el = $('pg-hosps'); if (!el) return;
+  el.innerHTML = `
+    <div class="ph"><h2>Your linked hospitals</h2><p>Hospitals tied to <strong>${CU.college}</strong> — you can consult any of these</p></div>
+    <div class="hosp-grid" id="hosp-grid">Loading…</div>`;
+  try {
+    const hosps = await api('/api/hospitals');
+    $('hosp-grid').innerHTML = hosps.map(h => `
+      <div class="hosp-card" onclick="openBookFromHosp('${h.id}','${h.name.replace(/'/g, "\\'")}')">
+        <div class="hc-top">
+          <div class="hc-icon">${h.logo || '🏥'}</div>
+          <div>
+            <div class="hc-name">${h.name}</div>
+            <div class="hc-addr">📍 ${h.address}</div>
+          </div>
+        </div>
+        <div class="hc-tags">
+          ${(h.specialties || []).slice(0, 3).map(s => `<span class="hc-tag">${s}</span>`).join('')}
+        </div>
+        <div class="hc-meta">
+          <div class="hc-meta-item">⏰ ${h.timings}</div>
+          <div class="hc-meta-item">🚨 ${h.emergency}</div>
+          <div class="hc-meta-item">🎓 ${h.discount}</div>
+          <div class="hc-meta-item">📞 ${h.phone}</div>
+        </div>
+        <button class="hc-btn">Book consultation →</button>
+      </div>`).join('');
+  } catch (e) { $('hosp-grid').innerHTML = '<div style="color:var(--ink3)">Could not load hospitals. Make sure the server is running.</div>' }
+}
+
+// ── BOOK PAGE ────────────────────────────────────────────────────
+async function openBookFromHosp(hospId, hospName) {
+  goTab('book');
+  let docs = [];
+  try { docs = await api(`/api/hospitals/${hospId}/doctors`); } catch (e) {}
+  const el = $('pg-book'); if (!el) return;
+  el.innerHTML = `
+    <div class="ph"><h2>Book appointment</h2><p>Doctor at <strong>${hospName}</strong> will receive a notification instantly</p></div>
+    <div style="display:grid;grid-template-columns:1fr 300px;gap:20px">
+      <div class="card">
+        <div class="book-hosp-banner">
+          <div class="bhi">🏥</div>
+          <div><h4>${hospName}</h4><p>Your assigned hospital · General Ward</p></div>
+        </div>
+        <div class="card-title">Appointment details</div>
+        <input type="hidden" id="b-hospid" value="${hospId}"/>
+        <div class="fgrid">
+          <div class="fg"><label>Name</label><input value="${CU.name}" readonly style="margin:0"/></div>
+          <div class="fg"><label>College</label><input value="${CU.college}" readonly style="margin:0"/></div>
+          <div class="fg" style="margin-top:12px"><label>Year</label><input value="${CU.year || ''}" readonly style="margin:0"/></div>
+          <div class="fg" style="margin-top:12px"><label>Hostel block</label><input value="${CU.hostel || '—'}" readonly style="margin:0"/></div>
+        </div>
+        <div style="margin-top:14px">
+          <label>Pick a doctor <span style="color:var(--ink4);font-weight:400">(optional)</span></label>
+          <select id="b-doc" style="margin-bottom:14px">
+            <option value="">Any available General Ward doctor</option>
+            ${docs.map(d => `<option value="${d.id}">${d.name} — ${d.specialty}</option>`).join('')}
+          </select>
+        </div>
+        <label>Describe your symptoms</label>
+        <textarea id="b-reason" rows="4" placeholder="e.g. Persistent headache and fever for 2 days. When did it start? Severity? Fever, body aches, nausea? Medications taken?" style="margin-bottom:12px"></textarea>
+        <input type="hidden" id="b-symp" value=""/>
+        <div class="fgrid" style="margin-bottom:18px">
+          <div class="fg">
+            <label>Preferred time</label>
+            <select id="b-time" style="margin:0">
+              <option>Today — Morning (9AM–12PM)</option>
+              <option>Today — Afternoon (1PM–5PM)</option>
+              <option>Today — Evening (5PM–8PM)</option>
+              <option>Tomorrow — Morning</option>
+              <option>Tomorrow — Afternoon</option>
+              <option>Flexible</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label>Priority</label>
+            <select id="b-prio" style="margin:0">
+              <option value="normal">Normal</option>
+              <option value="urgent">🔴 Urgent</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-green" onclick="submitBook()" style="width:100%;padding:13px;font-size:14px">
+          📅 Book appointment — notify doctor
+        </button>
+        <p style="font-size:12px;color:var(--ink4);text-align:center;margin-top:10px">Doctor receives a notification with your full details instantly</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card" style="background:var(--green-lt);border-color:var(--green-bd)">
+          <div class="card-title" style="font-size:14px;color:var(--green)">📋 What happens next</div>
+          <div style="font-size:13px;color:var(--green);line-height:2.2">
+            1️⃣ Doctor gets notified now<br>
+            2️⃣ Doctor confirms the appointment<br>
+            3️⃣ You get a notification<br>
+            4️⃣ Both join Twilio Video call
+          </div>
+        </div>
+        <div class="card" style="background:var(--red-lt);border-color:var(--red-bd)">
+          <div class="card-title" style="font-size:14px;color:var(--red)">🏥 ${hospName}</div>
+          <div id="hosp-side-info" style="font-size:12.5px;color:var(--red);line-height:2;opacity:.85">Loading…</div>
+        </div>
+      </div>
+    </div>`;
+
+  try {
+    const hosps = await api('/api/hospitals');
+    const h = hosps.find(x => x.id === hospId);
+    if (h) $('hosp-side-info').innerHTML = `📍 ${h.address}<br>⏰ ${h.timings}<br>🚨 Emergency: ${h.emergency}<br>📞 ${h.phone}<br>🎓 ${h.discount}`;
+  } catch (e) {}
+}
+
+async function submitBook() {
+  const reason = $('b-reason').value.trim();
+  const symp   = $('b-symp').value.trim();
+  const hospId = $('b-hospid').value;
+  const docId  = $('b-doc').value;
+  const time   = $('b-time').value;
+  const prio   = $('b-prio').value;
+  if (!reason) { toast('⚠️ Describe your main complaint'); return }
+  try {
+    const apt = await api('/api/appointments', { method: 'POST', body: { hospital_id: hospId, doctor_id: docId || null, reason, symptoms: symp, priority: prio, preferred_time: time } });
+    if (apt.error) { toast('❌ ' + apt.error); return }
+    toast('✅ Appointment booked — doctor notified!');
+    openModal(`
+      <div class="mhd"><h3>✅ Appointment booked</h3><button class="mcl" onclick="closeModal()">✕</button></div>
+      <div class="apt-id-block">
+        <span>Your appointment ID</span>
+        <code>${apt.id}</code>
+      </div>
+      <div class="notif-banner nb-success" style="margin-bottom:14px">
+        <div class="nb-ico">📩</div>
+        <div class="nb-body">
+          <strong>Doctor at ${apt.hospital_name} has been notified</strong>
+          <p>They will receive your name, college, hostel details, and symptoms. Once confirmed, you will see a notification to join the video call.</p>
+        </div>
+      </div>
+      <div class="apt-detail-block">
+        <div>🏥 Hospital: <strong>${apt.hospital_name}</strong></div>
+        <div>📋 Complaint: <strong>${apt.reason}</strong></div>
+        <div>⏰ Preferred: <strong>${apt.preferred_time}</strong></div>
+        <div>📹 Video room: <strong style="font-family:monospace">${apt.room_name}</strong></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-green" onclick="closeModal();goTab('apts')" style="flex:1">Track status →</button>
+        <button class="btn btn-outline" onclick="closeModal()" style="flex:1">Close</button>
+      </div>`);
+  } catch (e) { toast('⚠️ Server error. Make sure app.py is running.') }
+}
+
+// ── MY APPOINTMENTS ──────────────────────────────────────────────
+const ST = {
+  waiting:     { cls: 'waiting',    icon: '⏳', label: 'Waiting for doctor' },
+  confirmed:   { cls: 'confirmed',  icon: '✅', label: 'Doctor confirmed' },
+  in_progress: { cls: 'in_progress',icon: '🟢', label: 'In progress' },
+  completed:   { cls: 'completed',  icon: '🏁', label: 'Completed' },
+  cancelled:   { cls: 'cancelled',  icon: '✕',  label: 'Cancelled' },
+};
+function sbadge(s) { const m = ST[s] || { cls: 'waiting', icon: '?', label: s }; return `<span class="sbadge ${m.cls}">${m.icon} ${m.label}</span>` }
+
+async function loadAndRenderApts() {
+  const el = $('apts-list'); if (!el) return;
+  try {
+    APTS = await api('/api/appointments');
+    if (!APTS.length) {
+      el.innerHTML = `<div style="text-align:center;padding:50px;color:var(--ink4)">
+        <div style="font-size:48px;margin-bottom:14px">📋</div>
+        <div style="font-family:'Lora',serif;font-size:18px;font-weight:700;color:var(--ink2);margin-bottom:10px">No appointments yet</div>
+        <button class="btn btn-green" onclick="goTab('hosps')">See my hospitals &amp; book →</button>
+      </div>`;
+      return;
+    }
+    el.innerHTML = APTS.map(a => {
+      const canJoin = a.status === 'confirmed' || a.status === 'in_progress';
+      return `<div class="acard ${a.status}">
+        <div class="acard-grid">
+          <div>
+            <div class="a-id">${a.id}</div>
+            <div class="a-name">${a.reason}</div>
+            <div class="a-meta">
+              ${fmtDT(a.created_at)} · ${a.preferred_time || ''}
+              ${a.hospital_name ? ' · <span style="color:var(--red)">' + a.hospital_name + '</span>' : ''}
+              ${a.doctor_name   ? ' · <span style="color:var(--blue)">Dr: ' + a.doctor_name + '</span>' : ''}
+            </div>
+            ${a.symptoms ? `<div class="a-symp">🩺 ${a.symptoms}</div>` : ''}
+            ${a.status === 'waiting' ? `
+            <div class="notif-banner nb-warn" style="margin-top:10px;padding:12px 14px">
+              <div class="nb-ico" style="font-size:16px">⏳</div>
+              <div class="nb-body" style="font-size:12.5px">
+                <strong>Waiting for doctor to confirm</strong>
+                <p>A doctor at <strong>${a.hospital_name}</strong> will review your request and confirm shortly.</p>
+              </div>
+            </div>` : ''}
+            ${a.status === 'confirmed' ? `
+            <div class="notif-banner nb-success" style="margin-top:10px;padding:12px 14px">
+              <div class="nb-ico" style="font-size:16px">✅</div>
+              <div class="nb-body" style="font-size:12.5px">
+                <strong>${a.doctor_name || 'Doctor'} confirmed your appointment</strong>
+                <p>Join the video call now. Room: <code style="font-family:monospace;background:rgba(0,0,0,.06);padding:1px 6px;border-radius:4px">${a.room_name}</code></p>
+              </div>
+            </div>` : ''}
+          </div>
+          <div class="a-acts">
+            ${sbadge(a.status)}
+            ${canJoin ? `<button class="btn btn-blue btn-sm" onclick="goTab('video');setTimeout(()=>{if($('s-v-room'))$('s-v-room').value='${a.room_name}'},200)">📹 Join call</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) { toast('Could not load appointments') }
+}
+
+// ── DOCTOR NOTIFICATIONS ─────────────────────────────────────────
+async function loadNotifs() {
+  const el = $('notifs-list'); if (!el) return;
+  try {
+    NOTIFS = await api('/api/notifications');
+    updateNotifBadge();
+    if (!NOTIFS.length) {
+      el.innerHTML = `<div style="text-align:center;padding:50px;color:var(--ink4)">
+        <div style="font-size:48px;margin-bottom:14px">🔔</div>
+        <div style="font-family:'Lora',serif;font-size:18px;font-weight:700;color:var(--ink2)">No new notifications</div>
+        <p style="font-size:13px;margin-top:6px">Student appointments will appear here when booked</p>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="notif-banner nb-info" style="margin-bottom:16px">
+      <div class="nb-ico">📩</div>
+      <div class="nb-body"><strong>${NOTIFS.length} new appointment request${NOTIFS.length > 1 ? 's' : ''}</strong><p>Review and confirm to start the video consultation</p></div>
+    </div>` + NOTIFS.map(a => notifCard(a)).join('');
+  } catch (e) { el.innerHTML = '<div style="color:var(--ink3);padding:20px">Could not load notifications.</div>' }
+}
+
+function notifCard(a) {
+  return `<div class="dq-card ${a.priority === 'urgent' ? 'urgent' : ''}">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+        <span class="a-id" style="margin:0">${a.id}</span>
+        <span class="college-badge">🎓 ${a.student_college}</span>
+        ${a.priority === 'urgent' ? '<span class="urgent-badge">🔴 Urgent</span>' : ''}
+      </div>
+      <div class="a-name">${a.student_name}</div>
+      <div class="a-meta">${a.student_year || ''} · Hostel: ${a.student_hostel || '—'} · ${fmtDT(a.created_at)}</div>
+      <div class="a-reason">📋 ${a.reason}</div>
+      ${a.symptoms ? `<div class="a-symp">🩺 ${a.symptoms}</div>` : ''}
+      <div style="font-size:12px;color:var(--ink3);margin-top:6px">⏰ Preferred: <strong>${a.preferred_time || 'Flexible'}</strong> · 🏥 ${a.hospital_name}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;min-width:140px">
+      ${sbadge('waiting')}
+      <button class="btn btn-green btn-sm" onclick="confirmApt('${a.id}','${a.student_name.replace(/'/g, "\\'")}','${a.room_name}')">✅ Confirm &amp; notify</button>
+    </div>
+  </div>`;
+}
+
+function confirmApt(id, studentName, roomName) {
+  openModal(`
+    <div class="mhd"><h3>Confirm appointment</h3><button class="mcl" onclick="closeModal()">✕</button></div>
+    <div class="notif-banner nb-info" style="margin-bottom:14px">
+      <div class="nb-ico">📩</div>
+      <div class="nb-body"><strong>Student will be notified once you confirm</strong><p>They will see your name and a prompt to join the video call.</p></div>
+    </div>
+    <div class="dconf-detail">
+      Patient: <strong>${studentName}</strong><br>
+      Video room: <strong style="font-family:monospace">${roomName}</strong>
+    </div>
+    <label>Add a note for the patient <span style="color:var(--ink4);font-weight:400">(optional)</span></label>
+    <textarea id="doc-note" rows="2" placeholder="e.g. Please be ready at 3PM with your ID card" style="margin-bottom:16px"></textarea>
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-green" onclick="doConfirm('${id}','${roomName}')" style="flex:1">✅ Confirm — send notification</button>
+      <button class="btn btn-outline" onclick="closeModal()" style="flex:1">Cancel</button>
+    </div>`);
+}
+
+async function doConfirm(id, roomName) {
+  const note = ($('doc-note') || {}).value || '';
+  try {
+    const apt = await api(`/api/appointments/${id}/confirm`, { method: 'POST', body: { note } });
+    if (apt.error) { toast('❌ ' + apt.error); return }
+    closeModal();
+    toast('✅ Confirmed! Student notified.');
+    openModal(`
+      <div class="mhd"><h3>✅ Confirmed</h3><button class="mcl" onclick="closeModal()">✕</button></div>
+      <div class="notif-banner nb-success" style="margin-bottom:14px">
+        <div class="nb-ico">🟢</div>
+        <div class="nb-body"><strong>${apt.student_name} has been notified</strong><p>They will join the video call using room: <code style="font-family:monospace">${roomName}</code></p></div>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-red" onclick="closeModal();goTab('dvideo');setTimeout(()=>{if($('d-v-room'))$('d-v-room').value='${roomName}'},200)" style="flex:1">📹 Start video call</button>
+        <button class="btn btn-outline" onclick="closeModal();loadQueue()" style="flex:1">View queue</button>
+      </div>`);
+    loadNotifs();
+  } catch (e) { toast('⚠️ Server error') }
+}
+
+async function loadQueue() {
+  try {
+    APTS = await api('/api/appointments');
+    const el = $('queue-list'); if (!el) return;
+    const w = APTS.filter(a => a.status === 'waiting').length;
+    const c = APTS.filter(a => a.status === 'confirmed').length;
+    const d = APTS.filter(a => a.status === 'completed').length;
+    if ($('ds-w')) $('ds-w').textContent = w;
+    if ($('ds-c')) $('ds-c').textContent = c;
+    if ($('ds-d')) $('ds-d').textContent = d;
+    if ($('ds-t')) $('ds-t').textContent = APTS.length;
+    if (!APTS.length) {
+      el.innerHTML = `<div style="text-align:center;padding:50px;color:var(--ink4)"><div style="font-size:48px;margin-bottom:14px">📋</div><div style="font-family:'Lora',serif;font-size:18px;font-weight:700;color:var(--ink2)">No appointments yet</div></div>`;
+      return;
+    }
+    el.innerHTML = APTS.map(a => `
+      <div class="dq-card ${a.priority === 'urgent' ? 'urgent' : ''}">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px">
+            <span class="a-id" style="margin:0">${a.id}</span>
+            <span class="college-badge">🎓 ${a.student_college}</span>
+            ${a.priority === 'urgent' ? '<span class="urgent-badge">🔴 Urgent</span>' : ''}
+          </div>
+          <div class="a-name">${a.student_name}</div>
+          <div class="a-meta">${a.student_year || ''} · Hostel: ${a.student_hostel || '—'} · ${fmtDT(a.created_at)}</div>
+          <div class="a-reason">📋 ${a.reason}${a.symptoms ? '<br>🩺 ' + a.symptoms : ''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          ${sbadge(a.status)}
+          ${a.status === 'waiting' ? `<button class="btn btn-green btn-sm" onclick="confirmApt('${a.id}','${a.student_name.replace(/'/g, "\\'")}','${a.room_name}')">Confirm</button>` : ''}
+          ${(a.status === 'confirmed' || a.status === 'in_progress') ? `<button class="btn btn-blue btn-sm" onclick="goTab('dvideo');setTimeout(()=>{if($('d-v-room'))$('d-v-room').value='${a.room_name}'},200)">📹 Start call</button>` : ''}
+        </div>
+      </div>`).join('');
+  } catch (e) { toast('Could not load queue') }
+}
+
+async function loadCases() {
+  const el = $('cases-list'); if (!el) return;
+  try {
+    const apts = await api('/api/appointments');
+    const mine = apts.filter(a => a.doctor_id === CU.user_id && a.status !== 'waiting');
+    if (!mine.length) {
+      el.innerHTML = `<div style="text-align:center;padding:50px;color:var(--ink4)"><div style="font-size:48px;margin-bottom:14px">📋</div><div style="font-family:'Lora',serif;font-size:18px;font-weight:700;color:var(--ink2)">No cases yet</div></div>`;
+      return;
+    }
+    el.innerHTML = mine.map(a => {
+      const canJoin = a.status === 'confirmed' || a.status === 'in_progress';
+      return `<div class="acard ${a.status}">
+        <div class="acard-grid">
+          <div>
+            <div class="a-id">${a.id}</div>
+            <div class="a-name">${a.student_name}</div>
+            <div class="a-meta">${a.student_college} · ${a.student_year || ''} · Hostel: ${a.student_hostel || '—'} · ${fmtDT(a.created_at)}</div>
+            <div class="a-reason">📋 ${a.reason}${a.symptoms ? '<br>🩺 ' + a.symptoms : ''}</div>
+          </div>
+          <div class="a-acts">
+            ${sbadge(a.status)}
+            ${canJoin ? `<button class="btn btn-red btn-sm" onclick="goTab('dvideo');setTimeout(()=>{if($('d-v-room'))$('d-v-room').value='${a.room_name}'},200)">📹 Call</button>` : ''}
+            ${a.status === 'in_progress' ? `<button class="btn btn-outline btn-sm" onclick="markDone('${a.id}')">Mark complete</button>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {}
+}
+
+async function markDone(id) {
+  await api(`/api/appointments/${id}/status`, { method: 'PATCH', body: { status: 'completed' } });
+  toast('🏁 Consultation completed'); dEndCall(); loadCases();
+}
+
+// ── POLL FOR DOCTOR NOTIFICATIONS ────────────────────────────────
+async function pollNotifs() {
+  try { const n = await api('/api/notifications'); NOTIFS = n; updateNotifBadge(); } catch (e) {}
+  setTimeout(pollNotifs, 8000);
+}
+function updateNotifBadge() { const dot = $('notif-dot'); if (dot) dot.style.display = NOTIFS.length ? 'block' : 'none' }
+function toggleNotifPanel() { if (CU.role === 'doctor') goTab('notifs') }
+
+// ── VIDEO HINT ────────────────────────────────────────────────────
+async function renderVideoHint() {
+  const el = $('vid-hint'); if (!el) return;
+  try {
+    const apts = APTS.length ? APTS : await api('/api/appointments');
+    const active = apts.filter(a => a.status === 'confirmed' || a.status === 'in_progress');
+    if (active.length) {
+      const a = active[0];
+      el.innerHTML = `<div class="notif-banner nb-success" style="margin-bottom:14px">
+        <div class="nb-ico">🟢</div>
+        <div class="nb-body"><strong>Room ready — Dr. ${a.doctor_name || ''} confirmed</strong><p>Room name is pre-filled below. Click Join call.</p></div>
+      </div>`;
+      if ($('s-v-room')) $('s-v-room').value = a.room_name;
+    } else {
+      el.innerHTML = `<div class="notif-banner nb-info" style="margin-bottom:14px">
+        <div class="nb-ico">ℹ️</div>
+        <div class="nb-body"><strong>Book an appointment first</strong><p>Once a doctor confirms, the room name will appear here automatically.</p></div>
+      </div>`;
+    }
+  } catch (e) {}
+}
+
+// ── MEDBOT ────────────────────────────────────────────────────────
+function autoH(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 96) + 'px' }
+function sq(q) { const i = $('cin'); if (!i) return; i.value = q; sendChat() }
+
+async function sendChat() {
+  const i = $('cin'), msg = i.value.trim();
+  if (!msg) return;
+  addMsg('u', msg); i.value = ''; i.style.height = 'auto';
+  $('csend').disabled = true;
+  const tid = addTyping();
+  try {
+    const d = await api('/api/chat', { method: 'POST', body: { message: msg } });
+    removeTyping(tid);
+    addMsg('b', d.message || 'Sorry, something went wrong.');
+    if ((d.suggest || chatIdx >= 2) && !nudgeDone) showNudge();
+    chatIdx++;
+  } catch (e) {
+    removeTyping(tid);
+    addMsg('b', BOT_FALLBACK[chatIdx % BOT_FALLBACK.length]);
+    chatIdx++;
+    if (chatIdx >= 2 && !nudgeDone) showNudge();
+  }
+  $('csend').disabled = false;
+}
+function addMsg(role, txt) {
+  const c = $('msgs'); if (!c) return;
+  const d = document.createElement('div'); d.className = 'msg ' + role;
+  d.innerHTML = `<div class="mav">${role === 'b' ? 'MB' : inits(CU.name)}</div><div class="mbub">${txt.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function addTyping() {
+  const c = $('msgs'), id = 'ty' + Date.now();
+  const d = document.createElement('div'); d.className = 'msg b'; d.id = id;
+  d.innerHTML = `<div class="mav">MB</div><div class="mbub"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight; return id;
+}
+function removeTyping(id) { const e = $(id); if (e) e.remove() }
+function showNudge() {
+  nudgeDone = true;
+  const n = $('chat-suggest'); if (!n) return;
+  n.style.display = 'block';
+  n.innerHTML = `<div class="chat-suggest"><span>🏥 Want to consult a doctor at one of your linked hospitals?</span><button class="btn btn-green btn-sm" onclick="goTab('hosps')">See hospitals →</button></div>`;
+}
+
+// ── TWILIO VIDEO (Student) ────────────────────────────────────────
+async function sJoinCall() {
+  const room = ($('s-v-room') || {}).value?.trim();
+  if (!room) { toast('Enter the room name from your appointment'); return }
+  $('s-v-idle').style.display = 'none';
+  $('s-v-spin').style.display = 'flex';
+  $('s-v-join').disabled = true;
+  try {
+    const td = await api('/api/video/token', { method: 'POST', body: { room_name: room } });
+    if (td.error) throw new Error(td.error);
+    lTracks = await Twilio.Video.createLocalTracks({ audio: true, video: { width: 640 } });
+    twilioRoom = await Twilio.Video.connect(td.token, { name: room, tracks: lTracks, dominantSpeaker: true });
+    const ld = $('ldiv');
+    lTracks.forEach(t => { if (t.kind === 'video') ld.appendChild(t.attach()) });
+    ld.style.display = 'block';
+    twilioRoom.participants.forEach(p => onPart(p, 's'));
+    twilioRoom.on('participantConnected', p => onPart(p, 's'));
+    twilioRoom.on('participantDisconnected', () => { const e = $('s-v-partner'); if (e) e.textContent = 'Participant left.' });
+    twilioRoom.on('disconnected', () => resetVid('s'));
+    $('s-v-spin').style.display = 'none';
+    $('s-v-active').style.display = 'flex';
+    $('s-v-ctrl').style.display = 'flex';
+    $('s-v-info').style.display = 'block';
+    $('s-v-rname').textContent = room;
+    $('s-v-idname').textContent = td.identity;
+    toast('📹 Connected!');
+    const apt = APTS.find(a => a.room_name === room);
+    if (apt && apt.status === 'confirmed') api(`/api/appointments/${apt.id}/status`, { method: 'PATCH', body: { status: 'in_progress' } });
+  } catch (err) {
+    $('s-v-spin').style.display = 'none';
+    $('s-v-idle').style.display = 'flex';
+    $('s-v-join').disabled = false;
+    toast('❌ ' + (err.message || 'Connection failed. Check Twilio credentials.'));
+    console.error(err);
+  }
+}
+
+function onPart(p, side) {
+  const el = $(side === 's' ? 'rdiv' : 'drdiv'); if (!el) return;
+  el.style.display = 'flex';
+  const pn = $(side + '-v-partner'); if (pn) pn.textContent = p.identity + ' joined';
+  const pi = $(side + '-v-pname');   if (pi) pi.textContent = p.identity + ' is in the call';
+  p.tracks.forEach(pub => { if (pub.isSubscribed) el.appendChild(pub.track.attach()) });
+  p.on('trackSubscribed',   t => el.appendChild(t.attach()));
+  p.on('trackUnsubscribed', t => t.detach().forEach(e => e.remove()));
+}
+function sMic() { micOn = !micOn; lTracks.forEach(t => { if (t.kind === 'audio') micOn ? t.enable() : t.disable() }); const b = $('s-v-mic'); b.textContent = micOn ? '🎤' : '🔇'; b.classList.toggle('muted', !micOn) }
+function sCam() { camOn = !camOn; lTracks.forEach(t => { if (t.kind === 'video') camOn ? t.enable() : t.disable() }); const b = $('s-v-cam'); b.textContent = camOn ? '📷' : '🚫'; b.classList.toggle('muted', !camOn) }
+function sEndCall() {
+  if (twilioRoom) { twilioRoom.disconnect(); twilioRoom = null }
+  lTracks.forEach(t => { t.stop(); t.detach().forEach(e => e.remove()) }); lTracks = [];
+  resetVid('s'); toast('📵 Call ended');
+}
+function resetVid(side) {
+  $(`${side}-v-idle`).style.display = 'flex';
+  $(`${side}-v-spin`).style.display = 'none';
+  $(`${side}-v-active`).style.display = 'none';
+  $(`${side}-v-ctrl`).style.display = 'none';
+  $(`${side}-v-info`).style.display = 'none';
+  $(`${side}-v-join`).disabled = false;
+  ['rdiv', 'ldiv', 'drdiv', 'dldiv'].forEach(id => { const e = $(id); if (e) { e.style.display = 'none'; e.innerHTML = '' } });
+  const mb = $(side + '-v-mic'), cb = $(side + '-v-cam');
+  if (mb) { mb.textContent = '🎤'; mb.classList.remove('muted') }
+  if (cb) { cb.textContent = '📷'; cb.classList.remove('muted') }
+}
+
+// ── TWILIO VIDEO (Doctor) ─────────────────────────────────────────
+async function dJoinCall() {
+  const room = ($('d-v-room') || {}).value?.trim();
+  if (!room) { toast('Enter room name'); return }
+  $('d-v-idle').style.display = 'none';
+  $('d-v-spin').style.display = 'flex';
+  $('d-v-join').disabled = true;
+  try {
+    const td = await api('/api/video/token', { method: 'POST', body: { room_name: room } });
+    if (td.error) throw new Error(td.error);
+    dTracks = await Twilio.Video.createLocalTracks({ audio: true, video: { width: 640 } });
+    const room2 = await Twilio.Video.connect(td.token, { name: room, tracks: dTracks });
+    const dl = $('dldiv');
+    dTracks.forEach(t => { if (t.kind === 'video') dl.appendChild(t.attach()) });
+    dl.style.display = 'block';
+    room2.participants.forEach(p => onPart(p, 'd'));
+    room2.on('participantConnected', p => onPart(p, 'd'));
+    room2.on('disconnected', () => resetVid('d'));
+    if (!twilioRoom) twilioRoom = room2;
+    $('d-v-spin').style.display = 'none';
+    $('d-v-active').style.display = 'flex';
+    $('d-v-ctrl').style.display = 'flex';
+    $('d-v-info').style.display = 'block';
+    $('d-v-rname').textContent = room;
+    $('d-v-idname').textContent = td.identity;
+    toast('📹 Video call started!');
+    const apt = APTS.find(a => a.room_name === room);
+    if (apt && apt.status === 'confirmed') api(`/api/appointments/${apt.id}/status`, { method: 'PATCH', body: { status: 'in_progress' } });
+  } catch (err) {
+    $('d-v-spin').style.display = 'none';
+    $('d-v-idle').style.display = 'flex';
+    $('d-v-join').disabled = false;
+    toast('❌ ' + (err.message || 'Check Twilio credentials.'));
+    console.error(err);
+  }
+}
+function dTMic() { dMicOn = !dMicOn; dTracks.forEach(t => { if (t.kind === 'audio') dMicOn ? t.enable() : t.disable() }); const b = $('d-v-mic'); b.textContent = dMicOn ? '🎤' : '🔇'; b.classList.toggle('muted', !dMicOn) }
+function dTCam() { dCamOn = !dCamOn; dTracks.forEach(t => { if (t.kind === 'video') dCamOn ? t.enable() : t.disable() }); const b = $('d-v-cam'); b.textContent = dCamOn ? '📷' : '🚫'; b.classList.toggle('muted', !dCamOn) }
+function dEndCall() {
+  if (twilioRoom) { twilioRoom.disconnect(); twilioRoom = null }
+  dTracks.forEach(t => { t.stop(); t.detach().forEach(e => e.remove()) }); dTracks = [];
+  resetVid('d'); toast('📵 Call ended');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+{
+  "USERS": {
+    "STU001": {
+      "name": "Asha Kumar",
+      "pw": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "role": "student",
+      "college": "MIT Pune",
+      "year": "3rd Year CSE",
+      "hostel": "HB-12",
+      "created_at": "2026-04-06T22:13:22.211222"
+    },
+    "STU002": {
+      "name": "Rohan Verma",
+      "pw": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "role": "student",
+      "college": "MIT Pune",
+      "year": "2nd Year ECE",
+      "hostel": "HB-07",
+      "created_at": "2026-04-06T22:13:22.211249"
+    },
+    "STU003": {
+      "name": "Preethi Iyer",
+      "pw": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "role": "student",
+      "college": "VIT Pune",
+      "year": "1st Year ME",
+      "hostel": "HB-03",
+      "created_at": "2026-04-06T22:13:22.211253"
+    },
+    "STU004": {
+      "name": "Arjun Nair",
+      "pw": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "role": "student",
+      "college": "COEP Pune",
+      "year": "4th Year Civil",
+      "hostel": "HB-22",
+      "created_at": "2026-04-06T22:13:22.211258"
+    },
+    "STU005": {
+      "name": "Syed Ibrahim",
+      "pw": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "role": "student",
+      "college": "CMR University",
+      "year": "3rd year data science",
+      "hostel": "HB-05",
+      "created_at": "2026-04-06T22:13:22.211261"
+    },
+    "DOC001": {
+      "name": "Dr. Priya Sharma",
+      "pw": "c3362e4da49c24d379b72152ae6c99f1fa035f52829dceed715a7bf8bb464b98",
+      "role": "doctor",
+      "specialty": "General Medicine",
+      "hospital_id": "HOSP01",
+      "hospital_name": "City General Hospital",
+      "available": true
+    },
+    "DOC002": {
+      "name": "Dr. Rahul Menon",
+      "pw": "c3362e4da49c24d379b72152ae6c99f1fa035f52829dceed715a7bf8bb464b98",
+      "role": "doctor",
+      "specialty": "Psychiatry",
+      "hospital_id": "HOSP01",
+      "hospital_name": "City General Hospital",
+      "available": true
+    },
+    "DOC003": {
+      "name": "Dr. Anita Desai",
+      "pw": "c3362e4da49c24d379b72152ae6c99f1fa035f52829dceed715a7bf8bb464b98",
+      "role": "doctor",
+      "specialty": "Dermatology",
+      "hospital_id": "HOSP02",
+      "hospital_name": "Sunrise Medical Centre",
+      "available": true
+    },
+    "DOC004": {
+      "name": "Dr. Kiran Patel",
+      "pw": "c3362e4da49c24d379b72152ae6c99f1fa035f52829dceed715a7bf8bb464b98",
+      "role": "doctor",
+      "specialty": "General Medicine",
+      "hospital_id": "HOSP02",
+      "hospital_name": "Sunrise Medical Centre",
+      "available": true
+    },
+    "DOC005": {
+      "name": "Dr. Sneha Nair",
+      "pw": "c3362e4da49c24d379b72152ae6c99f1fa035f52829dceed715a7bf8bb464b98",
+      "role": "doctor",
+      "specialty": "cardiologist",
+      "hospital_id": "HOSP02",
+      "hospital_name": "Sunrise Medical Centre",
+      "available": true
+    },
+    "DOC006": {
+      "name": "Dr. Arun Kumar",
+      "pw": "c3362e4da49c24d379b72152ae6c99f1fa035f52829dceed715a7bf8bb464b98",
+      "role": "doctor",
+      "specialty": "General Medicine",
+      "hospital_id": "HOSP03",
+      "hospital_name": "Pune Wellness Hospital",
+      "available": true
+    },
+    "DOC007": {
+      "name": "Dr. Varun Kumar",
+      "pw": "c3362e4da49c24d379b72152ae6c99f1fa035f52829dceed715a7bf8bb464b98",
+      "role": "doctor",
+      "specialty": "General Medicine",
+      "hospital_id": "HOSP04",
+      "hospital_name": "CV raman hospital",
+      "available": true
+    },
+    "98": {
+      "name": "Syed ibrahim",
+      "pw": "30a4bf8fb189799f42e910798754f3e5542cfd918acce574367fe9ead1106d53",
+      "role": "student",
+      "college": "CMR University",
+      "year": "2nd year",
+      "hostel": "H block",
+      "created_at": "2026-04-06T22:14:40.261602"
+    }
+  },
+  "CHAT_HIST": {
+    "chat-98": [
+      {
+        "role": "user",
+        "content": "fever"
+      },
+      {
+        "role": "assistant",
+        "content": "Headache with fever may be due to dehydration or infection. Ensure adequate fluid intake and monitor for other symptoms like stiff neck or confusion."
+      },
+      {
+        "role": "user",
+        "content": "fever and cold"
+      }
+    ]
+  },
+  "NOTIFICATIONS": {
+    "DOC001": [
+      "APT0E7146"
+    ],
+    "DOC002": [
+      "APT0E7146"
+    ],
+    "DOC003": [],
+    "DOC004": [],
+    "DOC005": [],
+    "DOC006": [],
+    "DOC007": []
+  }
+}
